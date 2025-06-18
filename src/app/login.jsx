@@ -27,7 +27,7 @@ const Login = () => {
       if (email === "admin@example.com" && password === "admin123") {
         router.push("/admin/dashboard");
       } else {
-        router.push("/gerant/dashboard");
+        router.push("/admin/dashboard");
       }
     } else {
       alert("Veuillez remplir tous les champs.");
