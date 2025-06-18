@@ -31,6 +31,9 @@ const Login = () => {
       else if(email === "gerant@example.com" && password === "gerant123"){
         router.push("/gerant/dashboard");
       }
+      else{
+        alert("Identifiants incorrects. Veuillez réessayer.");
+      }
     } else {
       alert("Veuillez remplir tous les champs.");
     }
