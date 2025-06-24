@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  password          String
+  role              Role       @default(GERANT)
+  verified          Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  name              String
+  otp               String?
+  otpExpires        DateTime?
+  adminBusinesses   Business[] @relation("AdminBusinesses")
+  managedBusinesses Business?  @relation("BusinessManager")
+}
+
+model Business {
+  id        String    @id @default(uuid())
+  name      String
+  adminId   String
+  managerId String?   @unique
+  createdAt DateTime  @default(now())
+  admin     User      @relation("AdminBusinesses", fields: [adminId], references: [id])
+  manager   User?     @relation("BusinessManager", fields: [managerId], references: [id])
+  products  Product[]
+  sales     Sale[]
+}
+
+model Product {
+  id          String       @id @default(uuid())
+  name        String
+  price       Float
+  businessId  String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  business    Business     @relation(fields: [businessId], references: [id])
+  saleDetails SaleDetail[]
+}
+
+model Sale {
+  id         String       @id @default(uuid())
+  date       DateTime     @default(now())
+  businessId String
+  createdAt  DateTime     @default(now())
+  business   Business     @relation(fields: [businessId], references: [id])
+  details    SaleDetail[]
+}
+
+model SaleDetail {
+  id         String  @id @default(uuid())
+  saleId     String
+  productId  String
+  quantity   Int
+  totalPrice Float
+  product    Product @relation(fields: [productId], references: [id])
+  sale       Sale    @relation(fields: [saleId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  GERANT
+}
