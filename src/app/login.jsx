@@ -15,29 +15,54 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react";
 import ModeToggle from "@/components/ModeToogle";
 
+
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (email && password) {
-      if (email === "admin@example.com" && password === "admin123") {
-        router.push("/admin/dashboard");
-      }
-      
-      else if(email === "gerant@example.com" && password === "gerant123"){
-        router.push("/gerant/dashboard");
-      }
-      else{
-        alert("Identifiants incorrects. Veuillez réessayer.");
-      }
-    } else {
-      alert("Veuillez remplir tous les champs.");
+  if (!email || !password) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Erreur de connexion");
+      return;
     }
-  };
+
+    // Stocker le token dans un cookie ou localStorage (selon ton choix)
+    localStorage.setItem("token", data.token);
+
+
+    // Rediriger selon le rôle
+    if (data.user.role === "ADMIN") {
+      router.push("/admin/dashboard");
+    } else if (data.user.role === "GERANT") {
+      router.push("/gerant/dashboard");
+    } else {
+      alert("Rôle inconnu.");
+    }
+  } catch (error) {
+    console.error("Erreur login:", error);
+    alert("Une erreur est survenue.");
+  }
+};
+
 
   return (
     <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900 px-4 flex items-center justify-center">
