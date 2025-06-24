@@ -171,7 +171,7 @@ const BoutiqueDashboard = () => {
           <Card className="bg-white dark:bg-gray-800 shadow-md">
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-gray-100">
-                Évolution des commandes par semaine
+                Évolution de la vente par semaine
               </CardTitle>
             </CardHeader>
             <CardContent>
