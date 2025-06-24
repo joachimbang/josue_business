@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server';
 export async function POST() {
   const response = NextResponse.json({ message: 'Déconnecté avec succès' });
 
-  // Supprime le cookie nommé "token"
   response.cookies.set('token', '', {
+    maxAge: 0,
+    path: '/',
     httpOnly: true,
-    expires: new Date(0), // Supprime le cookie
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    secure: process.env.NODE_ENV === 'production',
   });
 
   return response;
