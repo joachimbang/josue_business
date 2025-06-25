@@ -96,7 +96,7 @@ function Navbar() {
                   src={user.avatar || "https://github.com/shadcn.png"}
                   alt={user.name}
                 />
-                <AvatarFallback>{user.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+                <AvatarFallback>{user.name?.[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               <Button
                 variant="outline"
@@ -104,7 +104,8 @@ function Navbar() {
                 onClick={handleLogout}
                 className="ml-2"
               >
-                Se déconnecter
+                <LogIn className="w-4 h-4" />
+                <span className="hidden lg:inline">Se Deconnecter</span>
               </Button>
             </div>
           ) : (
