@@ -15,54 +15,62 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react";
 import ModeToggle from "@/components/ModeToogle";
 
-
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!email || !password) {
-    alert("Veuillez remplir tous les champs.");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Erreur de connexion");
+    if (!email || !password) {
+      alert("Veuillez remplir tous les champs.");
       return;
     }
 
-    // Stocker le token dans un cookie ou localStorage (selon ton choix)
-    localStorage.setItem("token", data.token);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
+      const data = await res.json();
 
-    // Rediriger selon le rôle
-    if (data.user.role === "ADMIN") {
-      router.push("/admin/dashboard");
-    } else if (data.user.role === "GERANT") {
-      router.push("/gerant/dashboard");
-    } else {
-      alert("Rôle inconnu.");
+      if (!res.ok) {
+        alert(data.message || "Erreur de connexion");
+        return;
+      }
+
+      // Stocker le token (optionnel)
+      localStorage.setItem("token", data.token);
+
+      // Redirection selon le rôle
+      const { role, businessId, businesses } = data.user;
+
+      if (role === "ADMIN") {
+        // Redirige vers dashboard admin ou affiche une liste de ses business
+        if (businesses && businesses.length === 1) {
+          router.push(`/admin/business/${businesses[0].id}`);
+        } else {
+          router.push("/admin/dashboard"); // page avec la liste
+        }
+      } else if (role === "GERANT") {
+        if (businessId) {
+          router.push(`/gerant/boutique/${businessId}`);
+        } else {
+          alert("Aucune boutique attribuée à ce gérant.");
+        }
+      } else {
+        alert("Rôle inconnu.");
+      }
+    } catch (error) {
+      console.error("Erreur login:", error);
+      alert("Une erreur est survenue.");
     }
-  } catch (error) {
-    console.error("Erreur login:", error);
-    alert("Une erreur est survenue.");
-  }
-};
-
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900 px-4 flex items-center justify-center">
@@ -73,9 +81,7 @@ const Login = () => {
 
       <Card className="w-full max-w-md shadow-lg border-0 bg-white dark:bg-gray-800">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">
-            Connexion
-          </CardTitle>
+          <CardTitle className="text-2xl text-center">Connexion</CardTitle>
           <CardDescription className="text-center">
             Accédez à votre tableau de bord
           </CardDescription>

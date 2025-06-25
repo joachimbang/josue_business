@@ -8,19 +8,25 @@ export async function GET() {
     const users = await prisma.user.findMany({
       where: {
         role: {
-          not: 'ADMIN', // Exclut les ADMIN
+          not: 'ADMIN', // Exclure les administrateurs
         },
       },
       orderBy: {
-        createdAt: 'desc', // Optionnel : trie les plus récents en premier
+        createdAt: 'desc',
       },
       select: {
-        // Sélectionne uniquement les champs nécessaires
         id: true,
+        verified: true,
         email: true,
         name: true,
         role: true,
         createdAt: true,
+        managedBusinesses: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
