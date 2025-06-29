@@ -26,7 +26,7 @@ export async function POST(req) {
     await prisma.user.update({
       where: { id: managerId },
       data: {
-        verify: true,
+        verified: true,
       },
     });
 
