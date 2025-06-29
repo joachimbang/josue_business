@@ -11,16 +11,24 @@ export async function PUT(req) {
 
   const { id, name, managerId } = await req.json();
 
-  if (!id || !name) {
-    return NextResponse.json({ message: 'ID et nom du business requis' }, { status: 400 });
-  }
+  // if (!id || !name) {
+  //   return NextResponse.json({ message: 'ID et nom du business requis' }, { status: 400 });
+  // }
 
   try {
     const updated = await prisma.business.update({
       where: { id },
       data: {
         name,
-        managerId: managerId || null,
+        managerId: managerId ,
+      },
+    });
+
+    // 2. Mettre à jour son statut (verify: true)
+    await prisma.user.update({
+      where: { id: managerId },
+      data: {
+        verified: true,
       },
     });
 
