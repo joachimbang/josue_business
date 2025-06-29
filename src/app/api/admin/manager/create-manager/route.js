@@ -30,6 +30,7 @@ export async function POST(req) {
   const manager = await prisma.user.create({
     data: {
       email,
+      verified: false,
       name,
       password: hashedPassword,
       role: 'GERANT',
