@@ -1,13 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const AjoutManager = ({ isOpenManager, onCloseManager }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
-  if (!isOpenManager) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,21 +25,21 @@ const AjoutManager = ({ isOpenManager, onCloseManager }) => {
     setLoading(true);
 
     try {
-        
-        const token = localStorage.getItem("token");
-        console.log("📦 Token récupéré depuis localStorage:", token);
+      const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.warn("⚠️ Aucun token trouvé.");
-          setLoading(false);
-          return;
-        }
+      if (!token) {
+        console.warn("⚠️ Aucun token trouvé.");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch("/api/admin/manager/create-manager", {
         method: "POST",
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        credentials: "include", // ✅ Important pour envoyer les cookies
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
         body: JSON.stringify({ name, email }),
       });
 
@@ -57,34 +62,16 @@ const AjoutManager = ({ isOpenManager, onCloseManager }) => {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-0"
-      aria-modal="true"
-      role="dialog"
-      tabIndex={-1}
-    >
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black"
-        style={{ opacity: 0.25 }}
-        onClick={onCloseManager}
-      />
+    <Dialog open={isOpenManager} onOpenChange={onCloseManager}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Ajouter un gérant</DialogTitle>
+          <DialogDescription>
+            Remplis les informations pour créer un nouveau gérant.
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Modal content */}
-      <div className="relative bg-white w-full max-w-xl rounded-xl p-8 shadow-2xl z-10">
-        <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors duration-300 text-2xl font-bold"
-          onClick={onCloseManager}
-          aria-label="Fermer la fenêtre"
-        >
-          &times;
-        </button>
-
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-          Ajouter un gérant
-        </h2>
-
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-6 mt-2">
           <div>
             <label htmlFor="nom" className="block text-gray-700 font-medium mb-1">
               Nom du gérant <span className="text-red-500">*</span>
@@ -95,8 +82,8 @@ const AjoutManager = ({ isOpenManager, onCloseManager }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex : Jean Dupont"
-              className="w-full rounded-md border text-black border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
+              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
@@ -110,16 +97,16 @@ const AjoutManager = ({ isOpenManager, onCloseManager }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Ex : jean@example.com"
-              className="w-full rounded-md border text-black border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
+              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 pt-2">
             <button
               type="button"
               onClick={onCloseManager}
-              className="px-6 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
+              className="px-6 py-2 rounded-md border text-gray-700 hover:bg-gray-100"
             >
               Annuler
             </button>
@@ -132,8 +119,8 @@ const AjoutManager = ({ isOpenManager, onCloseManager }) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

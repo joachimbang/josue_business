@@ -16,6 +16,7 @@ export async function POST(req) {
     return NextResponse.json({ message: 'Le nom du business est requis' }, { status: 400 });
   }
 
+  // ✅ Crée la boutique
   const business = await prisma.business.create({
     data: {
       name,
@@ -23,6 +24,14 @@ export async function POST(req) {
       managerId: managerId || null,
     },
   });
+
+  // ✅ Si un manager a été attribué, on le vérifie automatiquement
+  if (managerId) {
+    await prisma.user.update({
+      where: { id: managerId },
+      data: { verified: true },
+    });
+  }
 
   return NextResponse.json({ message: 'Business créé', business });
 }

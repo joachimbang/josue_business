@@ -1,5 +1,3 @@
-// src/app/api/admin/articles/route.js
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
@@ -18,6 +16,16 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Données invalides' }, { status: 400 });
     }
 
+    // 🔍 Récupérer le business
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { name: true }, // uniquement le nom
+    });
+
+    if (!business) {
+      return NextResponse.json({ message: 'Business introuvable' }, { status: 404 });
+    }
+
     // ✅ Enregistrer les articles
     const created = await Promise.all(
       articles.map((article) =>
@@ -34,6 +42,7 @@ export async function POST(req) {
 
     return NextResponse.json({
       message: 'Articles ajoutés avec succès',
+      businessName: business.name,
       produits: created,
     });
   } catch (err) {
